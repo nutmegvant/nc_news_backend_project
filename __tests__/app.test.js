@@ -23,4 +23,19 @@ describe('/api/topics', () => {
             })
         })
     });
-})
+});
+
+describe('/api', () => {
+    test('returns an object of APIs with their description', () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then((response) => {
+                expect(response.body.apiData).toMatchObject({
+                    "GET /api": expect.any(Object),
+                    "GET /api/topics": expect.any(Object),
+                    "GET /api/articles":expect.any(Object)
+                })
+            })
+    });
+});

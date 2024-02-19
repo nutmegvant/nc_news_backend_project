@@ -1,12 +1,14 @@
 const db = require('./db/connection.js')
 const express = require('express')
-const {getAllTopics} = require('./controller/app.controller.js')
+const {getAllTopics, getApis} = require('./controller/app.controller.js')
 
 const app = express()
 
 app.use(express.json())
 
 app.get('/api/topics', getAllTopics)
+
+app.get('/api', getApis)
 
 
 app.use((err, request, response, next) => {
