@@ -3,7 +3,7 @@ const data = require('../db/data/test-data/index.js');
 const seed = require('../db/seeds/seed.js');
 const db = require('../db/connection.js');
 const app = require('../app.js');
-
+const apiEndpointsJSON = require('../endpoints.json')
 
 beforeEach(() => seed(data));
 afterAll(() => db.end())
@@ -22,8 +22,17 @@ describe('/api/topics', () => {
                 })
             })
         })
-    });
-});
+    })
+    test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
+        return request(app)
+        .get('/api/topices')
+        .expect(404)
+        .then((response) => {
+            console.log(response.body)
+        expect(response.body.msg).toBe('Invalid URL');
+        });
+})
+})
 
 describe('/api', () => {
     test('returns an object of APIs with their description', () => {
@@ -31,11 +40,7 @@ describe('/api', () => {
         .get('/api')
         .expect(200)
         .then((response) => {
-                expect(response.body.apiData).toMatchObject({
-                    "GET /api": expect.any(Object),
-                    "GET /api/topics": expect.any(Object),
-                    "GET /api/articles":expect.any(Object)
-                })
+                expect(response.body.apiData).toEqual(apiEndpointsJSON)
             })
     });
 });

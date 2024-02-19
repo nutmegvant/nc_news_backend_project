@@ -1,6 +1,6 @@
 const db = require('./db/connection.js')
 const express = require('express')
-const {getAllTopics, getApis} = require('./controller/app.controller.js')
+const {getAllTopics, getApis, wrongPath} = require('./controller/app.controller.js')
 
 const app = express()
 
@@ -10,6 +10,8 @@ app.get('/api/topics', getAllTopics)
 
 app.get('/api', getApis)
 
+app.get('*', wrongPath);
+
 
 app.use((err, request, response, next) => {
     if (err.status && err.msg) {
@@ -17,10 +19,5 @@ app.use((err, request, response, next) => {
     }
     })
 
-app.use((err, request, response, next) => {
-    if (err.status === 404) {
-        response.status(404).send({msg: 'Invalid URL'})
-    }
-})
 
 module.exports = app;
