@@ -14,9 +14,9 @@ describe('/api/topics', () => {
         .get('/api/topics')
         .expect(200)
         .then((response) => {
-            const {rows} = response.body
-            rows.forEach(row => {
-                expect(row).toMatchObject({
+            const {topics} = response.body
+            topics.forEach(topic => {
+                expect(topic).toMatchObject({
                     description: expect.any(String),
                     slug: expect.any(String),
                 })
@@ -87,9 +87,9 @@ describe('/api/articles', () => {
         .get('/api/articles')
         .expect(200)
         .then((response) => {
-            const {rows} = response.body
-            rows.forEach(row => {
-                expect(row).toMatchObject({
+            const {articles} = response.body
+            articles.forEach(article => {
+                expect(article).toMatchObject({
                     title: expect.any(String),
                     topic: expect.any(String),
                     author: expect.any(String),

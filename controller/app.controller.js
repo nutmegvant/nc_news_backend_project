@@ -4,7 +4,7 @@ const data = require("../endpoints.json");
 const getAllTopics = (req, res, next) => {
     selectTopics()
         .then((data) => {
-            res.status(200).send({ rows: data });
+            res.status(200).send({ topics: data });
         })
         .catch((err) => {
             next(err);
@@ -51,7 +51,7 @@ const getAllArticles = (req, res, next) => {
                 article_img_url: article.article_img_url
             }
             ))
-            res.status(200).send({ rows: noBodyObj });
+            res.status(200).send({ articles: noBodyObj });
         })
         .catch((err) => {
             next(err);

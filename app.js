@@ -21,8 +21,6 @@ app.get("/api/articles", getAllArticles);
 app.get("/api", getApis);
 
 
-
-
 app.get("*", wrongPath);
 
 app.use((err, request, response, next) => {
