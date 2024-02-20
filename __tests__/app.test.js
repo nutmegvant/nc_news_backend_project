@@ -9,7 +9,7 @@ beforeEach(() => seed(data));
 afterAll(() => db.end())
 
 describe('/api/topics', () => {
-    test('GET: 200 returns an array of all objects', () => {
+    test('GET: 200 returns an array of all objects within topics', () => {
         return request(app)
         .get('/api/topics')
         .expect(200)
@@ -28,10 +28,9 @@ describe('/api/topics', () => {
         .get('/api/topices')
         .expect(404)
         .then((response) => {
-            console.log(response.body)
         expect(response.body.msg).toBe('Invalid URL');
         });
-})
+    })
 })
 
 describe('/api', () => {
@@ -51,19 +50,62 @@ describe('/api/articles/:article_id', () => {
         .get('/api/articles/1')
         .expect(200)
         .then((response) => {
+            const {article} = response.body
+            expect(article.article_id).toBe(1)
+            expect(article).toMatchObject({
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+            })
+        })
+    });
+    test('GET:404 sends an appropriate status and error message when provided with a non-existent but valid id', () => {
+        return request(app)
+        .get('/api/articles/999')
+        .expect(404)
+        .then((response) => {
+        expect(response.body.msg).toBe('Article does not exist');
+        });
+    });
+    test('GET:400 sends an appropriate status and error message when provided with a invalid id', () => {
+        return request(app)
+        .get('/api/articles/abc')
+        .expect(400)
+        .then((response) => {
+        expect(response.body.msg).toBe('Bad request');
+        });
+    })
+});
+
+describe('/api/articles', () => {
+    test('GET: 200 returns an array of all objects within articles without body property, sotyed in descending order by creation date', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
             const {rows} = response.body
             rows.forEach(row => {
                 expect(row).toMatchObject({
                     title: expect.any(String),
                     topic: expect.any(String),
                     author: expect.any(String),
-                    body: expect.any(String),
                     created_at: expect.any(String),
                     votes: expect.any(Number),
-                    article_img_url:
-                    expect.any(String),
+                    article_img_url: expect.any(String)
                 })
             })
         })
+    });
+    test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
+        return request(app)
+        .get('/api/articules')
+        .expect(404)
+        .then((response) => {
+        expect(response.body.msg).toBe('Invalid URL');
+        });
     })
-});
+})

@@ -7,7 +7,7 @@ const selectTopics = () => {
     });
 };
 
-const selectArticle = (id) => {
+const selectArticleById = (id) => {
     const query = "SELECT * FROM articles WHERE article_id = $1;";
     let params = [id];
     return db.query(query, params).then((result) => {
@@ -15,7 +15,14 @@ const selectArticle = (id) => {
     });
 };
 
+const selectArticles = () => {
+    return db.query("SELECT * FROM articles ORDER BY created_at DESC;").then((result) => {
+        return result.rows;
+    });
+}
+
 module.exports = {
     selectTopics,
-    selectArticle,
+    selectArticleById,
+    selectArticles
 };
