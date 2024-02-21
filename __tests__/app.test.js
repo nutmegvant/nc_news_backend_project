@@ -9,7 +9,7 @@ const jestSorted = require('jest-sorted');
 beforeEach(() => seed(data));
 afterAll(() => db.end())
 
-describe('GET /api/topics', () => {
+describe('GET: /api/topics', () => {
     test('GET: 200 returns an array of all objects within topics', () => {
         return request(app)
         .get('/api/topics')
@@ -26,7 +26,7 @@ describe('GET /api/topics', () => {
     })
 })
 
-describe('GET /api', () => {
+describe('GET: /api', () => {
     test('returns an object of APIs with their description', () => {
         return request(app)
         .get('/api')
@@ -37,7 +37,7 @@ describe('GET /api', () => {
     });
 });
 
-describe('GET /api/articles/:article_id', () => {
+describe('GET: /api/articles/:article_id', () => {
     test('GET: 200 an article object with all associated properties', () => {
         return request(app)
         .get('/api/articles/1')
@@ -52,7 +52,7 @@ describe('GET /api/articles/:article_id', () => {
     });    
 });
 
-describe('GET /api/articles', () => {
+describe('GET: /api/articles', () => {
     test('GET: 200 returns an array of all objects within articles without body property, sorted in descending order by creation date', () => {
         return request(app)
         .get('/api/articles')
@@ -76,7 +76,7 @@ describe('GET /api/articles', () => {
     });
 });
 
-describe('GET /api/articles/:article_id/comments', () => {
+describe('GET: /api/articles/:article_id/comments', () => {
     test('GET: 200 returns all comments associated with a specific article_id in ascending order based on creation date', () => {
         return request(app)
         .get('/api/articles/1/comments')
@@ -95,8 +95,25 @@ describe('GET /api/articles/:article_id/comments', () => {
                 })
                 expect(comments).toBeSorted({ descending: false });
             })
-    })
+    });
+    test('POST:201', () => {
+        const newComment = {
+            author: 'butter_bridge',
+            comment: 'did  you know that peppa pig is actually vegetarian?',
+            article_id: 1
+            }
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+            expect(response.body.comment.author).toBe(newComment.author);
+        expect(response.body.comment.body).toBe(newComment.comment);
+        expect(response.body.comment.article_id).toBe(newComment.article_id);
+        })
+    });
 })
+
 
 describe('Error Handling', () => {
     describe('404: Bad Path', () => {
@@ -125,6 +142,20 @@ describe('Error Handling', () => {
             });
         });
     });
+    test('POST: 404 Username not found', () => {
+        const newComment = {
+            author: 'peppapig',
+            comment: 'winner winner chicken dinner',
+            article_id: 2
+            }
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send(newComment)
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Username not found');
+        })
+    })
     describe('GET:400 Bad Request', () => {
         test('GET:400 sends an appropriate status and error message when provided with a invalid id', () => {
             return request(app)

@@ -59,5 +59,19 @@
       ]
       
     }
+  },
+  "POST /api/articles/:article_id/comments":{
+    "description": "posts a comments associated with a specific article_id",
+    "query":["author", "body", "article_id"],
+    "exampleResponse":{
+      "comment": {
+        "comment_id": 19,
+        "body": "did  you know that peppa pig is actually vegetarian?",
+        "article_id": 1,
+        "author": "butter_bridge",
+        "votes": 0,
+        "created_at": "2024-02-21T16:11:52.339Z"
+        }
+      }
   }
 }

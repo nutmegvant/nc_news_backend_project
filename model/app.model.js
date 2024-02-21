@@ -46,9 +46,20 @@ const selectAllCommentsForArticle = (id) => {
     });
 };
 
+const insertComment = (id, username, body) => {
+    return db
+    .query(`INSERT INTO comments(author, body, article_id)
+    VALUES ($1, $2, $3)
+    RETURNING *;`, [username, body, id])
+    .then((result) => {
+        return result.rows[0]
+    })
+}
+
 module.exports = {
     selectTopics,
     selectArticleById,
     selectArticles,
     selectAllCommentsForArticle,
+    insertComment,
 };
