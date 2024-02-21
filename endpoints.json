@@ -44,7 +44,7 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "returns all comments associated with a specific article_id in ascending order based on creation date",
+    "description": "returns all comments associated with a specific article_id in ascending order based on creation date ",
     "queries":["article_id"],
     "exampleResponse":{
       "article_id = 1" : [
