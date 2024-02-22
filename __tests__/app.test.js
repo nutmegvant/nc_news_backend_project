@@ -70,6 +70,8 @@ describe('GET: /api/articles', () => {
                     article_img_url: expect.any(String),
                     comments_count: expect.any(String)
                 })
+                const articleBody = {body: expect.any(String)}
+                expect(articles).toEqual(expect.not.objectContaining(articleBody))
                 expect(articles).toBeSorted({ descending: true });
             })
         })
