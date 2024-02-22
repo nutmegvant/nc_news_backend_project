@@ -1,5 +1,5 @@
 const request = require('supertest');
-const data = require('../db/data/test-data/index.js');
+const data = require('../db/data/development-data/index.js');
 const seed = require('../db/seeds/seed.js');
 const db = require('../db/connection.js');
 const app = require('../app.js');
@@ -49,7 +49,7 @@ describe('GET: /api/articles/:article_id', () => {
                 created_at: expect.any(String)
             })
         })
-    });    
+    })   
 });
 
 describe('GET: /api/articles', () => {
@@ -59,7 +59,7 @@ describe('GET: /api/articles', () => {
         .expect(200)
         .then((response) => {
             const {articles} = response.body
-            expect(articles.length).toBe(13)
+            expect(articles.length).toBe(37)
             articles.forEach(article => {
                 expect(article).toMatchObject({
                     title: expect.any(String),
@@ -87,7 +87,7 @@ describe('GET: /api/articles/:article_id/comments', () => {
                 expect(comment).toMatchObject({
                     comment_id : expect.any(Number),
                     body: expect.any(String),
-                    article_id: expect.any(Number),
+                    article_id: 1,
                     author: expect.any(String),
                     votes: expect.any(Number),
                     created_at: expect.any(String)
@@ -98,7 +98,7 @@ describe('GET: /api/articles/:article_id/comments', () => {
     });
     test('POST:201', () => {
         const newComment = {
-            author: 'butter_bridge',
+            author: 'tickle122',
             comment: 'did  you know that peppa pig is actually vegetarian?',
             article_id: 1
             }
@@ -154,6 +154,14 @@ describe('Error Handling', () => {
         .expect(404)
         .then((response) => {
             expect(response.body.msg).toBe('Username not found');
+        })
+    });
+    test('GET: 404 Article does not have any comments', () => {
+        return request(app)
+        .get('/api/articles/37/comments')
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe("Article does not have any comments")
         })
     })
     describe('GET:400 Bad Request', () => {

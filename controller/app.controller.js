@@ -49,7 +49,14 @@ const getAllArticles = (req, res, next) => {
 const getComments = (req, res, next) => {
     selectAllCommentsForArticle(req.params.article_id)
     .then((data) => {
+        if (data.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "Article does not have any comments"
+                })
+        } else {
         res.status(200).send({ comments: data })
+        }
     })
     .catch((err) => {
         next(err);
@@ -68,4 +75,5 @@ const postComment = (req, res, next) => {
     })
 }
 
-module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment };
+
+module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, };

@@ -56,6 +56,7 @@ const insertComment = (id, username, body) => {
     })
 }
 
+
 module.exports = {
     selectTopics,
     selectArticleById,

@@ -27,7 +27,6 @@ app.post("/api/articles/:article_id/comments", postComment);
 
 
 
-
 app.get("*", wrongPath);
 
 app.use((err, request, response, next) => {
