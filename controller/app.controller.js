@@ -51,7 +51,7 @@ const getComments = (req, res, next) => {
     .then((data) => {
         if (data.length === 0){
             res.status(200).send({ comments: data, msg: 'No comments yet' })
-        } else {
+        } else{
             res.status(200).send({ comments: data })
         }
     })
