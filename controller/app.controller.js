@@ -22,15 +22,8 @@ const wrongPath = (req, res, next) => {
 const getArticleById = (req, res, next) => {
     selectArticleById(req.params.id)
         .then((data) => {
-            if (data.length === 0){
-                return Promise.reject({
-                    status: 404,
-                    msg: "Article does not exist"
-                    })
-            } else {
             res.status(200).send({ article: data[0] });
-            }
-        })
+            })
         .catch((err) => {
             next(err);
         });
