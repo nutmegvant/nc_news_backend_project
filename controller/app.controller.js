@@ -50,12 +50,9 @@ const getComments = (req, res, next) => {
     selectAllCommentsForArticle(req.params.article_id)
     .then((data) => {
         if (data.length === 0){
-            return Promise.reject({
-                status: 404,
-                msg: "Article does not have any comments"
-                })
+            res.status(200).send({ comments: data, msg: 'No comments yet' })
         } else {
-        res.status(200).send({ comments: data })
+            res.status(200).send({ comments: data })
         }
     })
     .catch((err) => {

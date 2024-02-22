@@ -49,8 +49,25 @@ describe('GET: /api/articles/:article_id', () => {
                 created_at: expect.any(String)
             })
         })
-    })   
-});
+    });
+    test('GET:400 sends an appropriate status and error message when provided with a invalid id', () => {
+        return request(app)
+        .get('/api/articles/abc')
+        .expect(400)
+        .then((response) => {
+        expect(response.body.msg).toBe('Bad Request');
+        });
+    });
+    test('GET:404 sends an appropriate status and error message when provided with a non-existent but valid id', () => {
+        return request(app)
+        .get('/api/articles/999')
+        .expect(404)
+        .then((response) => {
+        expect(response.body.msg).toBe('Article does not exist');
+        });
+    });
+});   
+
 
 describe('GET: /api/articles', () => {
     test('GET: 200 returns an array of all objects within articles without body property, sorted in descending order by creation date', () => {
@@ -98,7 +115,15 @@ describe('GET: /api/articles/:article_id/comments', () => {
                 expect(comments).toBeSorted({ descending: false });
             })
     });
-    test('POST:201', () => {
+    test('GET: 200 Article does not have any comments', () => {
+        return request(app)
+        .get('/api/articles/37/comments')
+        .expect(200)
+        .then((response) => {
+            expect(response.body.msg).toBe('No comments yet')
+        })
+    })
+    test('POST:201 posting a new comment', () => {
         const newComment = {
             author: 'tickle122',
             comment: 'did  you know that peppa pig is actually vegetarian?',
@@ -114,36 +139,6 @@ describe('GET: /api/articles/:article_id/comments', () => {
         expect(response.body.comment.article_id).toBe(newComment.article_id);
         })
     });
-})
-
-
-describe('Error Handling', () => {
-    describe('404: Bad Path', () => {
-        test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
-        return request(app)
-        .get('/api/articules')
-        .expect(404)
-        .then((response) => {
-            expect(response.body.msg).toBe('Invalid URL');
-            })
-        });
-        test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
-            return request(app)
-            .get('/api/topices')
-            .expect(404)
-            .then((response) => {
-            expect(response.body.msg).toBe('Invalid URL');
-            });
-        });
-        test('GET:404 sends an appropriate status and error message when provided with a non-existent but valid id', () => {
-            return request(app)
-            .get('/api/articles/999')
-            .expect(404)
-            .then((response) => {
-            expect(response.body.msg).toBe('Article does not exist');
-            });
-        });
-    });
     test('POST: 404 Username not found', () => {
         const newComment = {
             author: 'peppapig',
@@ -158,22 +153,24 @@ describe('Error Handling', () => {
             expect(response.body.msg).toBe('Username not found');
         })
     });
-    test('GET: 404 Article does not have any comments', () => {
+})
+
+
+describe('404: Bad Path', () => {
+    test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
+    return request(app)
+    .get('/api/articules')
+    .expect(404)
+    .then((response) => {
+        expect(response.body.msg).toBe('Invalid URL');
+        })
+    });
+    test('GET:404 sends an appropriate status and error message when given an invalid url', () => {
         return request(app)
-        .get('/api/articles/37/comments')
+        .get('/api/topices')
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toBe("Article does not have any comments")
-        })
-    })
-    describe('GET:400 Bad Request', () => {
-        test('GET:400 sends an appropriate status and error message when provided with a invalid id', () => {
-            return request(app)
-            .get('/api/articles/abc')
-            .expect(400)
-            .then((response) => {
-            expect(response.body.msg).toBe('Bad Request');
-            });
-        })
-    })
+        expect(response.body.msg).toBe('Invalid URL');
+        });
+    });
 });

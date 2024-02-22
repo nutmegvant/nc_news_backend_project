@@ -41,10 +41,14 @@ const selectAllCommentsForArticle = (id) => {
     const query =
         "SELECT * FROM comments WHERE article_id =$1 ORDER BY created_at ASC";
     let params = [id];
-    return db.query(query, params).then((results) => {
-        return results.rows;
-    });
-};
+    return db
+    .query(query, params)
+    .then((results) => {
+        return results.rows 
+    })
+}
+
+
 
 const insertComment = (id, username, body) => {
     return db
