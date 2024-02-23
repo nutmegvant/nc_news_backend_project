@@ -1,10 +1,10 @@
-const { selectTopics, selectArticle } = require("../model/app.model.js");
+const { selectTopics, selectArticleById, selectArticles, selectAllCommentsForArticle, insertComment } = require("../model/app.model.js");
 const data = require("../endpoints.json");
 
 const getAllTopics = (req, res, next) => {
     selectTopics()
         .then((data) => {
-            res.status(200).send({ rows: data });
+            res.status(200).send({ topics: data });
         })
         .catch((err) => {
             next(err);
@@ -20,13 +20,47 @@ const wrongPath = (req, res, next) => {
 };
 
 const getArticleById = (req, res, next) => {
-    selectArticle(req.params.id)
+    selectArticleById(req.params.id)
         .then((data) => {
-            res.status(200).send({ rows: data });
+            res.status(200).send({ article: data[0] });
+            })
+        .catch((err) => {
+            next(err);
+        });
+}
+
+const getAllArticles = (req, res, next) => {
+    selectArticles()
+        .then((data) => {
+            res.status(200).send({ articles: data });
         })
         .catch((err) => {
             next(err);
         });
 };
 
-module.exports = { getAllTopics, getApis, wrongPath, getArticleById };
+const getComments = (req, res, next) => {
+    selectAllCommentsForArticle(req.params.article_id)
+    .then((data) => {
+        if (data.length === 0){
+            res.status(200).send({ comments: data, msg: 'No comments yet' })
+        } else{
+            res.status(200).send({ comments: data })
+        }
+    })
+    .catch((err) => {
+        next(err);
+    });
+}
+
+const postComment = (req, res, next) => {
+    insertComment(req.params.article_id, req.body.author, req.body.comment)
+    .then((comment) => {
+        res.status(201).send({comment});
+    })
+    .catch((err) => {
+        next(err);
+    })
+}
+
+module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, };
