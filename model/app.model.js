@@ -67,30 +67,24 @@ const selectAllCommentsForArticle = (id) => {
 
 
 const insertComment = (id, username, body) => {
-    if (Number.isNaN(parseInt(id))){
-        return Promise.reject({
-            status: 400,
-            msg: "Invalid article id"
-            })
-    }
-    if (isEmpty(username) || isEmpty(body)){
+    if (isEmpty(username)){
         return Promise.reject({
         status: 400,
-        msg: "Missing comment body and or author name"
+        msg: "Missing author name in the comment"
         })
+    }
+    if (isEmpty(body)){
+        return Promise.reject({
+            status: 400,
+            msg: "Missing comment body"
+            })
     }
     return db.query(`INSERT INTO comments(author, body, article_id)
     VALUES ($1, $2, $3)
     RETURNING *;`, [username, body, id])
     .then((result) => {
-        if (result.rows.length === 0){
-            return Promise.reject({
-                status: 404,
-                msg: "Article does not exist"
-                })
-            } else {
-            return result.rows[0] }
-    }
+            return result.rows[0] 
+        }    
     )
 }
 
@@ -98,10 +92,41 @@ function isEmpty(value) {
     return (value == null || (typeof value === "string" && value.trim().length === 0));
 }
 
+const addNewVotes = (article_id, inc_votes) => {
+    if (isEmpty(inc_votes)){
+        return Promise.reject({
+        status: 400,
+        msg: "Missing votes to update"
+        })
+    }
+    const query = "SELECT * FROM articles WHERE article_id = $1;";
+    let params = [article_id];
+
+    return db.query(query, params).then((result) => {
+        if (result.rows.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "Article does not exist"
+                })
+            }
+            else {
+                const updatedVotes = result.rows[0].votes + inc_votes;
+                const updateParams = [updatedVotes, article_id]
+                return db.query(`UPDATE articles SET votes = $1 WHERE article_id = $2
+                RETURNING *`, updateParams)
+                .then((result) => {
+                    return result.rows[0];
+                })
+            }
+    });
+
+
+}
+
 module.exports = {
     selectTopics,
     selectArticleById,
     selectArticles,
     selectAllCommentsForArticle,
-    insertComment,
+    insertComment, addNewVotes
 };

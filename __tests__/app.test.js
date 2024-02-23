@@ -55,7 +55,7 @@ describe("GET: /api/articles/:article_id", () => {
             .get("/api/articles/abc")
             .expect(400)
             .then((response) => {
-                expect(response.body.msg).toBe("Bad Request");
+                expect(response.body.msg).toBe("Bad Request - type conversion issue");
             });
     });
     test("GET:404 sends an appropriate status and error message when provided with a non-existent but valid id", () => {
@@ -66,6 +66,84 @@ describe("GET: /api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Article does not exist");
             });
     });
+    test('PATCH: 200 update votes on an article', () => {
+        const votes = {inc_votes: 10}
+        return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(200)
+        .then((response) => {
+            const { article } = response.body
+            expect(article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                votes: 110 
+            });
+        })
+    });
+    test('PATCH: 200 ignores extra properties', () => {
+        const votes = {inc_votes: 10, isPointsCool: true}
+        return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(200)
+        .then((response) => {
+            const { article } = response.body
+            expect(article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                votes: 110 
+            });
+        })
+    });
+    test("PATCH: 404 sends an appropriate status and error message when provided with a non-existent but valid id", () => {
+        const votes = {inc_votes: 10}
+        return request(app)
+        .patch("/api/articles/999")
+        .send(votes)
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe("Article does not exist");
+            });
+    });
+    test("PATCH:400 sends an appropriate status and error message when provided with a invalid id", () => {
+        const votes = {inc_votes: 10}
+        return request(app)
+        .patch("/api/articles/abc")
+        .send(votes)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe("Bad Request - type conversion issue");
+            });
+    });
+    test("PATCH: 400 lacking votes", () => {
+        const votes = {}
+        return request(app)
+        .patch("/api/articles/1")
+        .send(votes)
+        .expect(400)
+        .then((response) => {
+                expect(response.body.msg).toBe("Missing votes to update");
+            });
+        });
+        test("PATCH: 400 bad input data type", () => {
+            const votes = {inc_votes: 'a'}
+            return request(app)
+            .patch("/api/articles/1")
+            .send(votes)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Bad Request - type conversion issue");
+            });
+        })
 });
 
 describe("GET: /api/articles", () => {
@@ -108,28 +186,25 @@ describe("GET: /api/articles/:article_id/comments", () => {
                 expect(comments[0]).toMatchObject({
                     comment_id: 9,
                     body: "Superficially charming",
-                    article_id: 1,
                     author: "icellusedkars",
                     votes: 0,
                     created_at: "2020-01-01T03:08:00.000Z",
                 });
             });
     });
-});
-test("GET: 200 Article does not have any comments", () => {
+    test("GET: 200 Article does not have any comments", () => {
     return request(app)
         .get("/api/articles/13/comments")
         .expect(200)
         .then((response) => {
             expect(response.body.msg).toBe("No comments yet");
         });
-});
-test("POST:201 posting a new comment", () => {
+    });
+    test("POST:201 posting a new comment", () => {
     const newComment = {
         author: "butter_bridge",
-        comment: "did  you know that peppa pig is actually vegetarian?",
-        article_id: 1,
-    };
+        comment: "did  you know that peppa pig is actually vegetarian"
+        };
     return request(app)
         .post("/api/articles/1/comments")
         .send(newComment)
@@ -138,17 +213,16 @@ test("POST:201 posting a new comment", () => {
             expect(response.body.comment.author).toBe(newComment.author);
             expect(response.body.comment.body).toBe(newComment.comment);
             expect(response.body.comment.article_id).toBe(
-                newComment.article_id
+                1
             );
         });
-});
-test("POST: 201 ignore unnecessary properties", () => {
+    });
+    test("POST: 201 ignore unnecessary properties", () => {
     const newComment = {
         author: "butter_bridge",
         comment: "did  you know that peppa pig is actually vegetarian?",
-        article_id: 1,
         likesVeggies: true,
-    };
+        };
     return request(app)
         .post("/api/articles/1/comments")
         .send(newComment)
@@ -157,37 +231,37 @@ test("POST: 201 ignore unnecessary properties", () => {
             expect(response.body.comment.author).toBe(newComment.author);
             expect(response.body.comment.body).toBe(newComment.comment);
             expect(response.body.comment.article_id).toBe(
-                newComment.article_id
+                1
             );
         });
-});
-test("POST: 404 Username not found", () => {
+    });
+    test("POST: 404 Username not found", () => {
     const newComment = {
         author: "peppapig",
         comment: "winner winner chicken dinner",
-    };
+        };
     return request(app)
         .post("/api/articles/2/comments")
         .send(newComment)
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toBe("Object not found");
+            expect(response.body.msg).toBe("Object not found - foreign key constraint");
         });
-});
-test('POST 400, invalid ID, e.g. string of "not-an-id"', () => {
+    });
+    test('POST 400, invalid ID, e.g. string of "not-an-id"', () => {
     const newComment = {
         author: "peppapig",
         comment: "winner winner chicken dinner",
-    };
+        };
     return request(app)
         .post("/api/articles/a/comments")
         .send(newComment)
         .expect(400)
         .then((response) => {
-            expect(response.body.msg).toBe("Invalid article id");
+            expect(response.body.msg).toBe("Bad Request - type conversion issue");
         });
-});
-test("POST: 404, non existent article ID", () => {
+    });
+    test("POST: 404, non existent article ID", () => {
     const newComment = {
         author: "tickle122",
         comment: "winner winner chicken dinner",
@@ -197,8 +271,33 @@ test("POST: 404, non existent article ID", () => {
         .send(newComment)
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toBe("Object not found");
+            expect(response.body.msg).toBe("Object not found - foreign key constraint");
         });
+    });
+    test("POST: 400 comment lacking body(comment)", () => {
+    const newComment = {
+        author: "tickle122"
+    };
+    return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe("Missing comment body");
+        });
+    });
+    test("POST: 400 comment lacking author in the comment", () => {
+    const newComment = {
+        comment: "winner winner chicken dinner"
+        };
+    return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe("Missing author name in the comment");
+        });
+});
 });
 
 describe("404: Bad Path", () => {
@@ -219,3 +318,4 @@ describe("404: Bad Path", () => {
             });
     });
 });
+
