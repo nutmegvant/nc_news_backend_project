@@ -46,13 +46,21 @@ const selectArticles = () => {
 };
 
 const selectAllCommentsForArticle = (id) => {
-    const query =
-        "SELECT * FROM comments WHERE article_id =$1 ORDER BY created_at ASC";
+    const query = "SELECT * FROM articles WHERE article_id = $1;";
     let params = [id];
-    return db
-    .query(query, params)
-    .then((results) => {
-        return results.rows 
+    return db.query(query, params).then((result) => {
+        if (result.rows.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "Article does not exist"
+                })
+            }
+            else {
+                const commentsQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at ASC`
+                return db.query(commentsQuery, params).then((comRes) => {
+                    return comRes.rows
+                })
+            }
     })
 }
 

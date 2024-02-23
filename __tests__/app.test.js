@@ -118,7 +118,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
 });
 test("GET: 200 Article does not have any comments", () => {
     return request(app)
-        .get("/api/articles/37/comments")
+        .get("/api/articles/13/comments")
         .expect(200)
         .then((response) => {
             expect(response.body.msg).toBe("No comments yet");
