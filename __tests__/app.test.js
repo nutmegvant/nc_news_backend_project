@@ -104,7 +104,6 @@ describe("GET: /api/articles/:article_id/comments", () => {
             .then((response) => {
                 const { comments } = response.body;
                 expect(comments.length).toBe(11);
-                console.log(response.body);
                 expect(comments).toBeSorted({ descending: false });
                 expect(comments[0]).toMatchObject({
                     comment_id: 9,
