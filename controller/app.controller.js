@@ -1,4 +1,4 @@
-const { selectTopics, selectArticleById, selectArticles, selectAllCommentsForArticle, insertComment } = require("../model/app.model.js");
+const { selectTopics, selectArticleById, selectArticles, selectAllCommentsForArticle, insertComment, addNewVotes } = require("../model/app.model.js");
 const data = require("../endpoints.json");
 
 const getAllTopics = (req, res, next) => {
@@ -63,4 +63,14 @@ const postComment = (req, res, next) => {
     })
 }
 
-module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, };
+const updateVotes = (req, res, next) => {
+    addNewVotes(req.params.article_id, req.body.inc_votes)
+    .then((article) => {
+        res.status(200).send({article})
+    })
+    .catch((err) => {
+        next(err);
+    })
+}
+
+module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, updateVotes };
