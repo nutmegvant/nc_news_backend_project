@@ -35,7 +35,7 @@ app.use((err, request, response, next) => {
     } else if (err.code === "22P02") {
         response.status(400).send({ msg: "Bad Request" });
     }else if (err.code === "23503") {
-        response.status(404).send({ msg: "Username not found" })
+        response.status(404).send({ msg: "Object not found" })
     } else {
         response.status(500).send({ msg: "Internal Server Error" });
     }

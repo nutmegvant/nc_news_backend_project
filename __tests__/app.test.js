@@ -1,5 +1,5 @@
 const request = require('supertest');
-const data = require('../db/data/development-data/index.js');
+const data = require('../db/data/test-data/index.js');
 const seed = require('../db/seeds/seed.js');
 const db = require('../db/connection.js');
 const app = require('../app.js');
@@ -76,7 +76,7 @@ describe('GET: /api/articles', () => {
         .expect(200)
         .then((response) => {
             const {articles} = response.body
-            expect(articles.length).toBe(37)
+            expect(articles.length).toBe(13)
             articles.forEach(article => {
                 expect(article).toMatchObject({
                     title: expect.any(String),
@@ -102,6 +102,7 @@ describe('GET: /api/articles/:article_id/comments', () => {
         .expect(200)
         .then((response) => {
             const {comments} = response.body
+            expect(comments.length).toBe(11)
             comments.forEach(comment => {
                 expect(comment).toMatchObject({
                     comment_id : expect.any(Number),
@@ -125,7 +126,7 @@ describe('GET: /api/articles/:article_id/comments', () => {
     })
     test('POST:201 posting a new comment', () => {
         const newComment = {
-            author: 'tickle122',
+            author: 'butter_bridge',
             comment: 'did  you know that peppa pig is actually vegetarian?',
             article_id: 1
             }
@@ -139,20 +140,62 @@ describe('GET: /api/articles/:article_id/comments', () => {
         expect(response.body.comment.article_id).toBe(newComment.article_id);
         })
     });
+    test('POST: 201 ignore unnecessary properties', () => {
+        const newComment = {
+            author: 'butter_bridge',
+            comment: 'did  you know that peppa pig is actually vegetarian?',
+            article_id: 1,
+            likesVeggies: true
+            }
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+            expect(response.body.comment.author).toBe(newComment.author);
+        expect(response.body.comment.body).toBe(newComment.comment);
+        expect(response.body.comment.article_id).toBe(newComment.article_id);
+        })
+    })
     test('POST: 404 Username not found', () => {
         const newComment = {
             author: 'peppapig',
             comment: 'winner winner chicken dinner',
-            article_id: 2
             }
         return request(app)
         .post('/api/articles/2/comments')
         .send(newComment)
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toBe('Username not found');
+            expect(response.body.msg).toBe('Object not found');
         })
     });
+    test('POST 400, invalid ID, e.g. string of "not-an-id"', () => {
+        const newComment = {
+            author: 'peppapig',
+            comment: 'winner winner chicken dinner',
+            }
+            return request(app)
+            .post('/api/articles/a/comments')
+            .send(newComment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe('Invalid article id')
+            })
+    });
+    test('POST: 404, non existent article ID', () => {
+        const newComment = {
+            author: 'tickle122',
+            comment: 'winner winner chicken dinner',
+            }
+            return request(app)
+            .post('/api/articles/999/comments')
+            .send(newComment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Object not found')
+            })
+    })
 })
 
 

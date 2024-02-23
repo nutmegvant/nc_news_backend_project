@@ -54,9 +54,7 @@ const getComments = (req, res, next) => {
 }
 
 const postComment = (req, res, next) => {
-    const newComment = req.body.comment;
-    const author = req.body.author;
-    insertComment(req.params.article_id, author, newComment)
+    insertComment(req.params.article_id, req.body.author, req.body.comment)
     .then((comment) => {
         res.status(201).send({comment});
     })
@@ -64,6 +62,5 @@ const postComment = (req, res, next) => {
         next(err);
     })
 }
-
 
 module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, };

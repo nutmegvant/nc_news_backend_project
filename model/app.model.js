@@ -59,15 +59,36 @@ const selectAllCommentsForArticle = (id) => {
 
 
 const insertComment = (id, username, body) => {
-    return db
-    .query(`INSERT INTO comments(author, body, article_id)
+    if (Number.isNaN(parseInt(id))){
+        return Promise.reject({
+            status: 400,
+            msg: "Invalid article id"
+            })
+    }
+    if (isEmpty(username) || isEmpty(body)){
+        return Promise.reject({
+        status: 400,
+        msg: "Missing comment body and or author name"
+        })
+    }
+    return db.query(`INSERT INTO comments(author, body, article_id)
     VALUES ($1, $2, $3)
     RETURNING *;`, [username, body, id])
     .then((result) => {
-        return result.rows[0]
-    })
+        if (result.rows.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "Article does not exist"
+                })
+            } else {
+            return result.rows[0] }
+    }
+    )
 }
 
+function isEmpty(value) {
+    return (value == null || (typeof value === "string" && value.trim().length === 0));
+}
 
 module.exports = {
     selectTopics,
