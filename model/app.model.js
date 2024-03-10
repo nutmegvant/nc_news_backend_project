@@ -119,8 +119,22 @@ const addNewVotes = (article_id, inc_votes) => {
                 })
             }
     });
+}
 
+const deleteCommentById = (comment_id) => {
+    const query = "DELETE FROM comments WHERE comment_id = $1"
+    let params = [comment_id];
+    
+    return db.query(query, params).then((result) => {
+        return result
+    })
+}
 
+const getAllUsers = () => {
+    const query = "SELECT username, name, avatar_url FROM users"
+    return db.query(query).then((result) => {
+        return result.rows
+    })
 }
 
 module.exports = {
@@ -128,5 +142,5 @@ module.exports = {
     selectArticleById,
     selectArticles,
     selectAllCommentsForArticle,
-    insertComment, addNewVotes
+    insertComment, addNewVotes, deleteCommentById, getAllUsers
 };

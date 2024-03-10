@@ -6,7 +6,7 @@ const {
     wrongPath,
     getArticleById,
     getAllArticles,
-    getComments, postComment, updateVotes
+    getComments, postComment, updateVotes, deleteComment, getUsers
 } = require("./controller/app.controller.js");
 
 const app = express();
@@ -25,9 +25,11 @@ app.get("/api/articles/:article_id/comments", getComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
-app.patch('/api/articles/:article_id', updateVotes);
+app.patch("/api/articles/:article_id", updateVotes);
 
+app.delete("/api/comments/:comment_id", deleteComment);
 
+app.get("/api/users", getUsers);
 app.get("*", wrongPath);
 
 app.use((err, request, response, next) => {

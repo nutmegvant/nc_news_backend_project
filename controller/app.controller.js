@@ -1,4 +1,4 @@
-const { selectTopics, selectArticleById, selectArticles, selectAllCommentsForArticle, insertComment, addNewVotes } = require("../model/app.model.js");
+const { selectTopics, selectArticleById, selectArticles, selectAllCommentsForArticle, insertComment, addNewVotes, deleteCommentById, getAllUsers } = require("../model/app.model.js");
 const data = require("../endpoints.json");
 
 const getAllTopics = (req, res, next) => {
@@ -73,4 +73,22 @@ const updateVotes = (req, res, next) => {
     })
 }
 
-module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, updateVotes };
+const deleteComment = (req, res, next) => {
+    deleteCommentById(req.params.comment_id).then(() => {
+        res.status(204).send()
+    })
+    .catch((err) => { 
+        next(err);
+    })
+}
+
+const getUsers = (req, res, next) => {
+    getAllUsers().then((data) => {
+        res.status(200).send({ users: data });
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+module.exports = { getAllTopics, getApis, wrongPath, getArticleById, getAllArticles, getComments, postComment, updateVotes, deleteComment, getUsers };

@@ -317,5 +317,38 @@ describe("404: Bad Path", () => {
                 expect(response.body.msg).toBe("Invalid URL");
             });
     });
+    test("GET:404 sends an appropriate status and error message when given an invalid url", () => {
+        return request(app)
+        .get("/api/usrs")
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe("Invalid URL");
+        });
+    })
 });
+
+describe("204: comment deleted", () => {
+    test("CORE: DELETE comment by id", () => {
+        return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+    })
+})
+
+describe("GET /api/users", () => {
+    test("GET:200 get all users", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then((response) => {
+                const { users } = response.body
+                users.forEach((user) => {
+                    expect(user).toMatchObject({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String)})
+                })
+            })
+    })
+})
 
