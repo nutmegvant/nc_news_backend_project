@@ -1,3 +1,4 @@
+const cors = require('cors');
 const db = require("./db/connection.js");
 const express = require("express");
 const {
@@ -10,6 +11,8 @@ const {
 } = require("./controller/app.controller.js");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -30,6 +33,7 @@ app.patch("/api/articles/:article_id", updateVotes);
 app.delete("/api/comments/:comment_id", deleteComment);
 
 app.get("/api/users", getUsers);
+
 app.get("*", wrongPath);
 
 app.use((err, request, response, next) => {
